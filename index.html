@@ -133,7 +133,7 @@
 </head>
 <body>
   <div class="card">
-    <div class="logo">🚚</div>
+    <div class="logo"></div>
     <h1>Bienvenido</h1>
     <p class="subtitle">Ingresa a tu cuenta para continuar</p>
 
@@ -152,5 +152,36 @@
 
     <!-- <p class="register">¿No tienes cuenta? <a href="#">Regístrate</a></p> -->
   </div>
+  <script>
+  // Esta función se ejecuta apenas carga la página
+  window.addEventListener('DOMContentLoaded', () => {
+    const API_URL = 'https://pruebahostingnodejs-production.up.railway.app/usuarios';
+
+    console.log("Intentando conectar con la base de datos...");
+
+    fetch(API_URL)
+      .then(response => {
+        if (!response.ok) throw new Error('Error en la red');
+        return response.json();
+      })
+      .then(data => {
+        console.log("¡Conexión exitosa! Usuarios encontrados:", data);
+        
+        // Opcional: Si quieres ver el primer nombre en el título de bienvenida
+        if (data.length > 0) {
+          document.querySelector('h1').innerText = `Hola, ${data[0].nombre}`;
+        }
+      })
+      .catch(error => {
+        console.error("Hubo un problema con la conexión:", error);
+      });
+  });
+
+  // Escuchar el clic del botón (Simulación de login)
+  document.querySelector('.btn').addEventListener('click', () => {
+    const user = document.getElementById('user').value;
+    alert('Intentando ingresar con: ' + user + '. Revisa la consola (F12) para ver los datos de la BD.');
+  });
+</script>
 </body>
 </html>
