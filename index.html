@@ -153,34 +153,49 @@
     <!-- <p class="register">¿No tienes cuenta? <a href="#">Regístrate</a></p> -->
   </div>
   <script>
-  // Esta función se ejecuta apenas carga la página
-  window.addEventListener('DOMContentLoaded', () => {
-    const API_URL = 'https://pruebahostingnodejs-production.up.railway.app/usuarios';
+  const btnLogin = document.querySelector('.btn');
+  const API_URL = 'https://tu-dominio-generado.up.railway.app/login';
 
-    console.log("Intentando conectar con la base de datos...");
+  btnLogin.addEventListener('click', async (e) => {
+    e.preventDefault(); // Evita que la página se recargue
 
-    fetch(API_URL)
-      .then(response => {
-        if (!response.ok) throw new Error('Error en la red');
-        return response.json();
-      })
-      .then(data => {
-        console.log("¡Conexión exitosa! Usuarios encontrados:", data);
-        
-        // Opcional: Si quieres ver el primer nombre en el título de bienvenida
-        if (data.length > 0) {
-          document.querySelector('h1').innerText = `Hola, ${data[0].name}`;
-        }
-      })
-      .catch(error => {
-        console.error("Hubo un problema con la conexión:", error);
+    const usuario = document.getElementById('user').value;
+    const password = document.getElementById('password').value;
+
+    // Feedback visual básico
+    btnLogin.innerText = 'Cargando...';
+    btnLogin.disabled = true;
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario, password }) // Enviamos los datos al backend
       });
-  });
 
-  // Escuchar el clic del botón (Simulación de login)
-  document.querySelector('.btn').addEventListener('click', () => {
-    const user = document.getElementById('user').value;
-    alert('Intentando ingresar con: ' + user + '. Revisa la consola (F12) para ver los datos de la BD.');
+      const data = await response.json();
+
+      if (data.success) {
+        // LOGIN EXITOSO
+        document.querySelector('.card').innerHTML = `
+          <div class="logo">✅</div>
+          <h1>¡Bienvenido, ${data.usuario}!</h1>
+          <p class="subtitle">Has iniciado sesión correctamente.</p>
+          <button class="btn" onclick="location.reload()">Cerrar Sesión</button>
+        `;
+      } else {
+        // ERROR DE LOGIN
+        alert(data.mensaje);
+        btnLogin.innerText = 'Iniciar sesión';
+        btnLogin.disabled = false;
+      }
+
+    } catch (error) {
+      console.error('Error:', error);
+      alert('No se pudo conectar con el servidor');
+      btnLogin.innerText = 'Iniciar sesión';
+      btnLogin.disabled = false;
+    }
   });
 </script>
 </body>
